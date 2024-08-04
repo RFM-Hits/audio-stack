@@ -60,3 +60,35 @@ fi
 if [ "$DO_UPDATES" == "y" ]; then
   update_os silent
 fi
+
+# Install Liquidsoap
+install_packages liquidsoap liquidsoap-plugin-all fdkaac libfdkaac-ocaml-dynlink
+    if [ $? -ne 0 ]; then
+        echo "*** Error: Failed to install Liquidsoap. Exiting."
+        exit 1
+    fi
+    if [ $? -eq 0 ]; then
+        echo "Liquidsoap has been installed successfully."
+    fi
+    else
+        echo "Liquidsoap is already installed."
+    fi
+
+ask_user "AUDIO_FALLBACK_URL" "https://raw.githubusercontent.com/RFM-Hits/audio-stack/main/fallback.ogg" "Enter the URL of the audio file to play when the stream is down:" "str"
+ask_user "LIQUIDSOAP_CONFIG_URL" "https://raw.githubusercontent.com/RFM-Hits/audio-stack/main/radio.liq" "Enter the URL of the Liquidsoap configuration file:" "str"
+
+# Download configuration and sample files
+echo -e "${BLUE}►► Downloading files...${NC}"
+curl -sLo  /var/audio/fallback.ogg "$AUDIO_FALLBACK_URL"
+curl -sLo  /etc/liquidsoap/radio.liq "$LIQUIDSOAP_CONFIG_URL"
+
+ask_user "LIQUIDSOAP_SERVICE_URL" "https://raw.githubusercontent.com/RFM-Hits/audio-stack/main/liquidsoap.service" "Enter the URL of the Liquidsoap service file:" "str"
+
+# Liquidsoap service installation
+echo -e "${BLUE}►► Setting up Liquidsoap service${NC}"
+rm -f /etc/systemd/system/liquidsoap.service
+curl -sLo  /etc/systemd/system/liquidsoap.service "$LIQUIDSOAP_SERVICE_URL"
+systemctl daemon-reload
+if ! systemctl is-enabled liquidsoap.service; then
+  systemctl enable liquidsoap.service
+fi
