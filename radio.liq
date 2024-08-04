@@ -6,7 +6,7 @@ settings.frame.audio.channels := 2
 settings.frame.audio.samplerate := 48000
 
 # Streaming configuration (do change this)
-icecastserver = "icecast.example.org"
+icecastserver = "icecast.rfmhits.nl"
 icecastport = 8000
 icecastpassword = "hackme"
 fallbackfile = "/var/audio/fallback.ogg"
@@ -79,32 +79,22 @@ def output_icecast_stream(~format, ~description, ~mount, ~source) =
     port=icecastport,
     password=icecastpassword,
     name=
-      "ZuidWest FM",
+      "RFM",
     description=description,
     mount=mount,
     source
   )
 end
 
-# StereoTool implementation
-radioproc =
-  stereotool(
-    library_file="/opt/stereotool/st_plugin.so",
-    license_key=
-      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    preset="/etc/liquidsoap/st.ini",
-    radio
-  )
 
-# Output StereoTool sound to a dummy output since we only use it for MicroMPX
-output.dummy(radioproc)
+
 
 # Output a high bitrate mp3 stream
 output_icecast_stream(
   format=%mp3(bitrate = 192, samplerate = 48000, internal_quality = 0),
   description=
-    "Hoge Kwaliteit Stream (192kbit MP3)",
-  mount="/zuidwest.mp3",
+    "RFM Hits - Hoge Kwaliteit Stream (192kbit MP3)",
+  mount="/rfmhits.mp3",
   source=audio_to_icecast
 )
 
@@ -121,25 +111,8 @@ output_icecast_stream(
       sbr_mode = true
     ),
   description=
-    "Mobile Stream (96kbit AAC)",
-  mount="/zuidwest.aac",
+    "RFM Hits - Mobile Stream (96kbit AAC)",
+  mount="/rfmhits.aac",
   source=audio_to_icecast
 )
 
-# Output a high bitrate AAC stream
-output_icecast_stream(
-  format=
-    %fdkaac(
-      channels = 2,
-      samplerate = 48000,
-      bitrate = 576,
-      afterburner = true,
-      aot = 'mpeg4_aac_lc',
-      transmux = 'adts',
-      sbr_mode = true
-    ),
-  description=
-    "Transport Stream (576kbit AAC)",
-  mount="/zuidwest.stl",
-  source=audio_to_icecast
-)
