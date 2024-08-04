@@ -70,9 +70,6 @@ install_packages liquidsoap liquidsoap-plugin-all fdkaac libfdkaac-ocaml-dynlink
     if [ $? -eq 0 ]; then
         echo "Liquidsoap has been installed successfully."
     fi
-    else
-        echo "Liquidsoap is already installed."
-    fi
 
 ask_user "AUDIO_FALLBACK_URL" "https://raw.githubusercontent.com/RFM-Hits/audio-stack/main/fallback.ogg" "Enter the URL of the audio file to play when the stream is down:" "str"
 ask_user "LIQUIDSOAP_CONFIG_URL" "https://raw.githubusercontent.com/RFM-Hits/audio-stack/main/radio.liq" "Enter the URL of the Liquidsoap configuration file:" "str"
