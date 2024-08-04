@@ -107,7 +107,7 @@ cat <<EOF > "$ICECAST_XML"
 EOF
 
 # Set capabilities
-setcap 'CAP)_NET_BIND_SERVICE=+eip' /usr/bin/icecast2
+setcap 'CAP_NET_BIND_SERVICE=+eip' /usr/bin/icecast2
 
 # Reload & restart Icecast2
 systemctl enable icecast2
