@@ -36,6 +36,10 @@ LIQUIDSOAP INSTALLER - RFM HITS - Version 1.0
 ******************************************************************                                                 
 EOF
 
+os_id=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+os_version=$(lsb_release -cs)
+os_arch=$(dpkg --print-architecture)
+
 # Configure environment
 set_colors
 check_privileges privileged
@@ -43,3 +47,16 @@ is_linux
 is_64bit
 set_timezone Europe/Amsterdam
 
+
+ask_user "DO_UPDATES" "y" "Do you want to update the system before installing Liquidsoap? (y/n)" "y/n"
+
+# OS-specific configurations for Debian Bookworm
+if [ "$os_version" == "bookworm" ]; then
+  install_packages silent software-properties-common
+  apt-add-repository -y non-free
+fi
+
+# Update OS
+if [ "$DO_UPDATES" == "y" ]; then
+  update_os silent
+fi
