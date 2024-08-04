@@ -101,3 +101,42 @@ CAT <<EOF > "$ICECAST_XML"
     </logging>
 </icecast>
 EOF
+
+# Set capabilities
+setcap 'CAP)_NET_BIND_SERVICE=+eip' /usr/bin/icecast2
+
+# Reload & restart Icecast2
+systemctl enable icecast2
+systemctl daemon-reload
+systemctl restart icecast2
+
+
+# SSL configuration
+if [ "$SSL" = "y" ] && [ "$PORT" = "80" ]; then
+  # Run Certbot to obtain SSL certificate
+  echo -e "${BLUE}►► Running Certbot to obtain SSL certificate...${NC}"
+  certbot --text --agree-tos --email "$ADMINMAIL" --noninteractive --no-eff-email --webroot --webroot-path="/usr/share/icecast2/web" -d "$HOSTNAME" --deploy-hook "cat /etc/letsencrypt/live/$HOSTNAME/fullchain.pem /etc/letsencrypt/live/$HOSTNAME/privkey.pem > /usr/share/icecast2/icecast.pem && systemctl restart icecast2" certonly
+
+  # Check if Certbot was successful
+  if [ -f "/usr/share/icecast2/icecast.pem" ]; then
+    # Update icecast.xml with SSL settings
+    sed -i "/<paths>/a \
+    \    <ssl-certificate>/usr/share/icecast2/icecast.pem</ssl-certificate>" "$ICECAST_XML"
+    
+    sed -i "/<\/listen-socket>/a \
+    <listen-socket>\n\
+        <port>443</port>\n\
+        <ssl>1</ssl>\n\
+    </listen-socket>" "$ICECAST_XML"
+
+    # Restart Icecast to apply new configuration
+    echo -e "${BLUE}►► Restarting Icecast with SSL support${NC}"
+    systemctl restart icecast2
+  else
+    echo -e "${YELLOW} !! SSL certificate acquisition failed. Icecast will continue running on port ${PORT}.${NC}"
+  fi
+else
+  if [ "$SSL" = "y" ]; then
+    echo -e "${YELLOW} !! SSL setup is only possible when Icecast is running on port 80. You entered port ${PORT}. Skipping SSL configuration.${NC}"
+  fi
+fi
