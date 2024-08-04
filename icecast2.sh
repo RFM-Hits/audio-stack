@@ -61,7 +61,7 @@ install_packages icecast2 certbot
 
 # Generate Icecast2 configuration
 ICECAST_XML="/etc/icecast2/icecast.xml"
-CAT <<EOF > "$ICECAST_XML"
+cat <<EOF > "$ICECAST_XML"
 <icecast>
     <location>$LOCATED</location>
     <admin>$ADMINMAIL</admin>
