@@ -35,3 +35,11 @@ _______________  ___  _   _ _____ _____ _____
 LIQUIDSOAP INSTALLER - RFM HITS - Version 1.0
 ******************************************************************                                                 
 EOF
+
+# Configure environment
+set_colors
+check_privileges privileged
+is_linux
+is_64bit
+set_timezone Europe/Amsterdam
+
